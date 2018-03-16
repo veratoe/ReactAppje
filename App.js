@@ -9,8 +9,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import {
+    ActivityIndicator,
     StatusBar,
-    TouchableHighlight,
     StyleSheet,
     ToolbarAndroid,
     Text,
@@ -18,25 +18,50 @@ import {
     ToastAndroid
 } from 'react-native';
 
+import PostsList from './components/PostsList';
+
 class App extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            posts: []
+            posts: [],
+            loading: false,
         }
     }
 
-    componentWillMount() {
+    loadPosts () {
+        this.setState({ 
+            'loading': true,
+            posts: []
+        });
+
         axios.get('http://www.reddit.com/r/all/.json?count=20')
-            .then((response) => { console.log("LING: "  + response.data.children); this.setState({'posts': response.data}) });
-        console.log('we hebben een axios dingetje gedaan');
+            .then((response) => {
+               this.setState({
+                   'posts': response.data.data.children,
+                   'loading': false
+               }) 
+                ToastAndroid.show("Lekker geladen, 200", ToastAndroid.SHORT);
+            });
+
+    }
+
+    componentWillMount() {
+        this.loadPosts();
+    }
+
+    componentDidMount() {
+
+        // ...
+
     }
 
     render() {
 
-        var items = "";
-        //var items = this.state.posts.map((item) => { return <Text key={item.data.id}>{item.data.author}</Text> });
+        let onAction = () => {
+            this.loadPosts();
+        }
 
         return (
             <View>
@@ -45,37 +70,23 @@ class App extends Component {
                     title="DOZZLE"
                     titleColor="#fff" 
                     style={{ backgroundColor: "#444", height: 50 }}
-                    actions={[{ title: 'Settings', icon: require('./logo.png'), show: 'always' }]}
-                    onActionSelected={this.onActionSelected} />
-
-                <View style={{ flexDirection: 'row', height: 100 }}>
-                    <TouchableHighlight onPress={() => { alert('ding!'); }} style={{ flex: 1}}>
-                       <View style={{ flex: 1, backgroundColor: 'steelblue' }} />
-                    </TouchableHighlight>
-
-                    <TouchableHighlight onPress={() => { alert('WUBAS!'); }} style={{ flex: 1}}>
-                       <View style={{ flex: 1, backgroundColor: 'lightyellow' }} />
-                    </TouchableHighlight>
-                </View>
+                    actions={[{ title: 'Settings', icon: require('./reload-icon.png'), show: 'always' }]}
+                    onActionSelected={onAction} />
 
                 <View>
                     <Text style={styles.welcome}>
-                        MAXIMUM WUB
+                        Reddit postjes
                     </Text>
 
-                    {items}
+                    {this.state.loading && <ActivityIndicator size="large" color="#84bcc3" style={{ marginTop: 100 }} />}
+
+                    <PostsList posts={this.state.posts} />
 
                 </View>
             </View>
         );
     }
-    componentDidMount() {
-        ToastAndroid.show("Het is dikke wub!", ToastAndroid.SHORT);
-    }
 
-    onActionSelected () {
-        ToastAndroid.show("PNG!", ToastAndroid.SHORT);
-    }
 }
 
 const styles = StyleSheet.create({
