@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FlatList, View, Text, Image } from 'react-native';
+import { FlatList, View, Text, Image, TouchableHighlight } from 'react-native';
 
 export default class PostsList extends Component {
 
     static propTypes = {
-        posts: PropTypes.array
+        posts: PropTypes.array,
+        navigation: PropTypes.object
     }
 
     render() {
@@ -24,22 +25,24 @@ export default class PostsList extends Component {
             <FlatList
                 data={this.props.posts}
                 renderItem={({item}) => { return (
-                    <View style={styles.container}>
-                        <Image source={{ uri: item.data.thumbnail }} style={{ height: 50, width: 50 }} />
-                        <View style={{  marginLeft: 10, flex: 1 }}>
-                            <View>
-                                <Text style={{ fontWeight: 'bold' }}>{item.data.title}</Text>
-                                <Text>
-                                    <Text style={{ color: '#ccc' }}>{item.data.author}</Text>
-                                </Text>
-                            </View>
-                            <View style={{ flexDirection: 'row' }} >
-                                <Text style={{ color: 'powderblue', fontWeight: 'bold' }}>{item.data.subreddit}</Text>  
-                                <Text style={{ color: '#999' }}>   { format_count(item.data.score) }</Text>
-                                <Text style={{ color: '#bbb', marginLeft: 'auto', marginRight: 5 }}> { format_time(item.data.created) }</Text>
+                    <TouchableHighlight onPress={() => { this.props.navigation.navigate('Thread', { item: item }); }}>
+                        <View style={styles.container}>
+                            <Image source={{ uri: item.data.thumbnail }} style={{ height: 50, width: 50 }} />
+                            <View style={{  marginLeft: 10, flex: 1 }}>
+                                <View>
+                                    <Text style={{ fontWeight: 'bold' }}>{item.data.title}</Text>
+                                    <Text>
+                                        <Text style={{ color: '#ccc' }}>{item.data.author}</Text>
+                                    </Text>
+                                </View>
+                                <View style={{ flexDirection: 'row' }} >
+                                    <Text style={{ color: 'powderblue', fontWeight: 'bold' }}>{item.data.subreddit}</Text>  
+                                    <Text style={{ color: '#999' }}>   { format_count(item.data.score) }</Text>
+                                    <Text style={{ color: '#bbb', marginLeft: 'auto', marginRight: 5 }}> { format_time(item.data.created) }</Text>
+                                </View>
                             </View>
                         </View>
-                    </View>
+                    </TouchableHighlight>
                 )}}
 
             />

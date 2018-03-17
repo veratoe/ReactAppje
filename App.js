@@ -4,112 +4,53 @@
  * @flow
  */
 
-/* global require */
+import { StackNavigator } from 'react-navigation';
+import { Animated, Easing } from 'react-native';
+import HomeScreen from './screens/HomeScreen';
+import ThreadScreen from './screens/ThreadScreen';
 
-import React, { Component } from 'react';
-import axios from 'axios';
-import {
-    ActivityIndicator,
-    StatusBar,
-    StyleSheet,
-    ToolbarAndroid,
-    Text,
-    View,
-    ToastAndroid
-} from 'react-native';
+export default StackNavigator(
 
-import PostsList from './components/PostsList';
-
-class App extends Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            posts: [],
-            loading: false,
-        }
-    }
-
-    loadPosts () {
-        this.setState({ 
-            'loading': true,
-            posts: []
-        });
-
-        axios.get('http://www.reddit.com/r/all/.json?count=20')
-            .then((response) => {
-               this.setState({
-                   'posts': response.data.data.children,
-                   'loading': false
-               }) 
-                ToastAndroid.show("Lekker geladen, 200", ToastAndroid.SHORT);
-            });
-
-    }
-
-    componentWillMount() {
-        this.loadPosts();
-    }
-
-    componentDidMount() {
-
-        // ...
-
-    }
-
-    render() {
-
-        let onAction = () => {
-            this.loadPosts();
+    // schermpjes
+    {
+        Home: {
+            screen: HomeScreen
+        },
+        Thread: {
+            screen: ThreadScreen
         }
 
-        return (
-            <View>
-                <StatusBar style={{ backgroundColor: "#ff0000" }} />
-                <ToolbarAndroid 
-                    title="DOZZLE"
-                    titleColor="#fff" 
-                    style={{ backgroundColor: "#444", height: 50 }}
-                    actions={[{ title: 'Settings', icon: require('./reload-icon.png'), show: 'always' }]}
-                    onActionSelected={onAction} />
+    },
 
-                <View>
-                    <Text style={styles.welcome}>
-                        Reddit postjes
-                    </Text>
+    // opties
+    { 
+        headerMode: 'none',
+        initialRouteName: 'Home',
+        transitionConfig: () => ({
+             transitionSpec: {
+               duration: 300,
+               easing: Easing.out(Easing.poly(4)),
+               timing: Animated.timing,
+             },
+             screenInterpolator: sceneProps => {
+               const { layout, position, scene } = sceneProps;
+               const { index } = scene;
 
-                    {this.state.loading && <ActivityIndicator size="large" color="#84bcc3" style={{ marginTop: 100 }} />}
+               const height = layout.initHeight;
+               const translateX = position.interpolate({
+                 inputRange: [index - 1, index, index + 1],
+                 outputRange: [height, 0, 0],
+               });
 
-                    <PostsList posts={this.state.posts} />
+               const opacity = position.interpolate({
+                 inputRange: [index - 1, index - 0.99, index],
+                 outputRange: [0, 1, 1],
+               });
 
-                </View>
-            </View>
-        );
+               return { opacity, transform: [{ translateX }] };
+             },
+           }),
     }
 
-}
+);
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF',
-    },
-    welcome: {
-        fontSize: 32,
-        textAlign: 'center',
-        margin: 10,
-    },
-    instructions: {
-        textAlign: 'center',
-        color: '#999999',
-        marginBottom: 25,
-    },
-
-    toolbar: {
-        height: 50,
-    }
-});
-
-export default App
