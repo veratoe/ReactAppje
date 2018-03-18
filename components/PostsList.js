@@ -16,7 +16,7 @@ export default class PostsList extends Component {
         }
 
         let format_time = (time) => {
-            let seconds = ((time * 1000) - new Date().getTime()) / 1000;
+            let seconds = (new Date().getTime() - new Date(time).getTime()) / 1000;
             if (seconds > 3600) return (seconds / 3600 | 0) + "h";
             return (seconds / 60 | 0) + "m";
         }
@@ -27,23 +27,24 @@ export default class PostsList extends Component {
                 renderItem={({item}) => { return (
                     <TouchableHighlight onPress={() => { this.props.navigation.navigate('Thread', { item: item }); }}>
                         <View style={styles.container}>
-                            <Image source={{ uri: item.data.thumbnail }} style={{ height: 50, width: 50 }} />
+                            <Image source={{ uri: item.image_url }} style={{ height: 50, width: 50 }} />
                             <View style={{  marginLeft: 10, flex: 1 }}>
                                 <View>
-                                    <Text style={{ fontWeight: 'bold' }}>{item.data.title}</Text>
+                                    <Text style={{ fontWeight: 'bold' }}>{item.title}</Text>
                                     <Text>
-                                        <Text style={{ color: '#ccc' }}>{item.data.author}</Text>
+                                        <Text style={{ color: '#ccc' }}>{item.author}</Text>
                                     </Text>
                                 </View>
                                 <View style={{ flexDirection: 'row' }} >
-                                    <Text style={{ color: 'powderblue', fontWeight: 'bold' }}>{item.data.subreddit}</Text>  
-                                    <Text style={{ color: '#999' }}>   { format_count(item.data.score) }</Text>
-                                    <Text style={{ color: '#bbb', marginLeft: 'auto', marginRight: 5 }}> { format_time(item.data.created) }</Text>
+                                    <Text style={{ color: 'powderblue', fontWeight: 'bold' }}>{item.tag}</Text>  
+                                    <Text style={{ color: '#999' }}>   { format_count(item.score) }</Text>
+                                    <Text style={{ color: '#bbb', marginLeft: 'auto', marginRight: 5 }}> { format_time(item.created_at) }</Text>
                                 </View>
                             </View>
                         </View>
                     </TouchableHighlight>
                 )}}
+                keyExtractor={({item}, index) => { return String(index) }}
 
             />
         )

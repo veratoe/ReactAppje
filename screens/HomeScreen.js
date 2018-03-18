@@ -40,13 +40,18 @@ export default class HomeScreen extends Component {
             posts: []
         });
 
-        axios.get('http://www.reddit.com/r/all/.json?count=20')
+        axios.get('http://192.168.1.21:8000/api/threads')
             .then((response) => {
-               this.setState({
-                   'posts': response.data.data.children,
-                   'loading': false
-               }) 
+                this.setState({
+                    'posts': response.data,
+                    'loading': false
+                })
                 ToastAndroid.show("Lekker geladen, 200", ToastAndroid.SHORT);
+            })
+            .catch((error) => {
+                console.log('Error bij laden');
+                console.log(error);
+                //ToastAndroid./showWithGravity("Netwerk error:" + error, ToastAndroid.SHORT);
             });
 
     }
@@ -79,7 +84,7 @@ export default class HomeScreen extends Component {
 
                 <View>
                     <Text style={styles.welcome}>
-                        Reddit postjes
+                        De leuke threads
                     </Text>
 
                     {this.state.loading && <ActivityIndicator size="large" color="#84bcc3" style={{ marginTop: 100 }} />}
